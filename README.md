@@ -4,7 +4,9 @@ An end-to-end data analysis project on four real automotive datasets: used-car l
 
 ![Dashboard preview](docs/dashboard_preview.png)
 
-**Dashboard:** open [`docs/index.html`](docs/index.html) in a browser (it works directly from disk, no server needed).
+**Live dashboard:** [adarbhh.github.io/automotive-data-analysis](https://adarbhh.github.io/automotive-data-analysis/)
+
+After cloning, the same dashboard is `docs/index.html`; it opens directly from disk, no server needed.
 
 ## Key findings
 
