@@ -1,0 +1,5 @@
+field,compared,gaps_filled,conflicts,conflict_pct
+Manufacturer,977,22,3,0.3
+Model year,999,0,3,0.3
+Drive type,579,152,12,2.1
+Fuel type,850,86,4,0.5

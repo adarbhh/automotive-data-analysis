@@ -1,0 +1,15 @@
+# Data files are large and are rebuilt by the scripts (see README for sources)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# IDE and tools
+.idea/
+.vscode/
+.claude/

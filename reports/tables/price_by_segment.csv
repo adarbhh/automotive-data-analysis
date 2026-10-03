@@ -1,0 +1,15 @@
+segment,value,listings,median_price
+drive,4wd,64512,15995.0
+drive,rwd,25920,13800.0
+drive,unknown,56405,9995.0
+drive,fwd,58018,8643.0
+fuel,diesel,11736,24500.0
+fuel,other,6977,21800.0
+fuel,unknown,1198,17880.0
+fuel,electric,734,17545.0
+fuel,gas,181533,10500.0
+fuel,hybrid,2677,9900.0
+transmission,other,10291,23990.0
+transmission,unknown,784,15988.0
+transmission,automatic,180616,10995.0
+transmission,manual,13164,8500.0

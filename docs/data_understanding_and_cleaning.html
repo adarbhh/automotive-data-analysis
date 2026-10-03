@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Understanding &amp; Cleaning</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface2: #f0f3f8;
+    --border: #dde3ed;
+    --accent: #2563eb;
+    --accent2: #0891b2;
+    --accent3: #d97706;
+    --accent4: #059669;
+    --accent-danger: #dc2626;
+    --text-primary: #111827;
+    --text-secondary: #4b5a6e;
+    --text-muted: #9aa5b4;
+    --tag-bg: #f8fafc;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-left {}
+
+  .phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    color: var(--accent);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+
+  .phase-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  h1 {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--text-primary);
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .meta-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .meta-tag {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .meta-tag strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ── SECTION CARDS ── */
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 32px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .section-card:nth-child(2) { animation-delay: 0.1s; }
+  .section-card:nth-child(3) { animation-delay: 0.2s; }
+  .section-card:nth-child(4) { animation-delay: 0.3s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .section-id {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .id-a1 { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+  .id-a2 { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+  .id-a3 { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+
+  .section-title {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .section-body {
+    padding: 28px;
+  }
+
+  /* ── SUBSECTIONS ── */
+  .subsection {
+    margin-bottom: 28px;
+  }
+  .subsection:last-child { margin-bottom: 0; }
+
+  .subsection-title {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .subsection-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── DATA DICT TABLE ── */
+  .dict-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 8px;
+  }
+
+  .dict-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    transition: border-color 0.2s;
+  }
+  .dict-row:hover { border-color: rgba(37,99,235,0.35); background: rgba(37,99,235,0.03); }
+
+  .dict-num {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 22px;
+    padding-top: 1px;
+  }
+
+  .dict-name {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent2);
+    min-width: 90px;
+  }
+
+  .dict-desc {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* Target highlight */
+  .dict-row.is-target { border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+  .dict-row.is-target .dict-name { color: var(--accent3); }
+  .dict-row.is-stable { border-color: rgba(59,130,246,0.2); }
+  .dict-row.is-fretext { border-color: rgba(16,185,129,0.2); }
+
+  /* ── COLUMN CLASSIFICATION ── */
+  .classification-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .class-card {
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .class-card-label {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  .class-card-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .class-pill {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+
+  .cc-target { background: rgba(217,119,6,0.07); border: 1px solid rgba(217,119,6,0.2); }
+  .cc-target .class-card-label { color: #b45309; }
+  .cc-target .class-pill { background: rgba(217,119,6,0.1); color: #92400e; }
+
+  .cc-stable { background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.15); }
+  .cc-stable .class-card-label { color: #1d4ed8; }
+  .cc-stable .class-pill { background: rgba(37,99,235,0.08); color: #1e40af; }
+
+  .cc-highcard { background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.12); }
+  .cc-highcard .class-card-label { color: #b91c1c; }
+  .cc-highcard .class-pill { background: rgba(220,38,38,0.08); color: #991b1b; }
+
+  .cc-freetext { background: rgba(5,150,105,0.05); border: 1px solid rgba(5,150,105,0.15); }
+  .cc-freetext .class-card-label { color: #047857; }
+  .cc-freetext .class-pill { background: rgba(5,150,105,0.08); color: #065f46; }
+
+  /* ── A2 TABLES ── */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .decision-table th {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .decision-table td {
+    padding: 10px 14px;
+    vertical-align: top;
+    border-bottom: 1px solid rgba(31,43,69,0.5);
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .decision-table tr:last-child td { border-bottom: none; }
+  .decision-table tr:hover td { background: rgba(37,99,235,0.03); }
+
+  .td-cols {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  .td-pct {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .badge-drop { color: #b91c1c; background: rgba(220,38,38,0.1); padding: 2px 8px; border-radius: 4px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; display: inline-block; }
+  .badge-drop-rows { color: #9f1239; background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.2); padding: 2px 8px; border-radius: 4px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; display: inline-block; }
+  .badge-impute { color: #065f46; background: rgba(5,150,105,0.1); padding: 2px 8px; border-radius: 4px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; display: inline-block; }
+  .badge-unknown { color: #92400e; background: rgba(217,119,6,0.1); padding: 2px 8px; border-radius: 4px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; display: inline-block; }
+  .badge-keep { color: #4c1d95; background: rgba(139,92,246,0.1); padding: 2px 8px; border-radius: 4px; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 11px; display: inline-block; }
+
+  .pct-drop { color: var(--accent-danger); }
+  .pct-high { color: var(--accent3); }
+  .pct-low { color: var(--accent4); }
+  .pct-zero { color: var(--text-muted); }
+
+  /* ── VALIDITY RULES ── */
+  .validity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .validity-card {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .validity-field {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 12px;
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  .validity-rule {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .validity-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ── A3 STATS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.stat-ok::before { background: var(--accent4); }
+  .stat-card.stat-warn::before { background: var(--accent-danger); }
+  .stat-card.stat-neutral::before { background: var(--accent); }
+
+  .stat-label {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .stat-ok .stat-value { color: #047857; }
+  .stat-warn .stat-value { color: #b91c1c; }
+  .stat-neutral .stat-value { color: #1d4ed8; }
+
+  .stat-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* ── LEAKAGE BLOCK ── */
+  .leakage-box {
+    background: rgba(5,150,105,0.05);
+    border: 1px solid rgba(5,150,105,0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .leakage-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .leakage-title {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-weight: 700;
+    color: #047857;
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+
+  .leakage-body {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .leakage-body strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ── METHOD ROW ── */
+  .method-steps {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .method-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .step-num {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #1d4ed8;
+    background: rgba(37,99,235,0.1);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 680px) {
+    .page-header { flex-direction: column; }
+    .meta-block { align-items: flex-start; }
+    .validity-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .dict-grid { grid-template-columns: 1fr; }
+    .classification-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* column names are the only text set in monospace */
+  .dict-name, .td-cols, .class-pill, .validity-field { font-family: ui-monospace, Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <a href="index.html" style="display:inline-block;margin-bottom:20px;font-size:13px;color:#2563eb;text-decoration:none;font-weight:600">&larr; Main dashboard</a>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="phase-badge">Phase 1 · EDA</div>
+      <h1><span>Data Understanding</span><br>&amp; Cleaning</h1>
+      <div class="subtitle">Craigslist Cars &amp; Trucks · Structured Analysis Report</div>
+    </div>
+    <div class="meta-block">
+      <div class="meta-tag">Dataset <strong>Craigslist Cars &amp; Trucks</strong></div>
+      <div class="meta-tag">Author <strong>Austin Reese</strong></div>
+      <div class="meta-tag">Downloaded <strong>13 / 01 / 2026</strong></div>
+      <div class="meta-tag">Rows <strong>426,880</strong></div>
+      <div class="meta-tag">Columns <strong>26</strong></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ A1 ══════ -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-id id-a1">A1</span>
+      <span class="section-title">Ingestion &amp; Schema Understanding</span>
+    </div>
+    <div class="section-body">
+
+      <!-- Data Dictionary -->
+      <div class="subsection">
+        <div class="subsection-title">Data Dictionary — 26 Columns</div>
+        <div class="dict-grid">
+
+          <div class="dict-row is-stable">
+            <span class="dict-num">01</span>
+            <span class="dict-name">id</span>
+            <span class="dict-desc">Unique identifier for the advertisement</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">02</span>
+            <span class="dict-name">url</span>
+            <span class="dict-desc">Link to the advertisement on Craigslist</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">03</span>
+            <span class="dict-name">region</span>
+            <span class="dict-desc">Region where the advertisement was posted</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">04</span>
+            <span class="dict-name">region_url</span>
+            <span class="dict-desc">Link to the regional Craigslist page</span>
+          </div>
+          <div class="dict-row is-target">
+            <span class="dict-num">05</span>
+            <span class="dict-name">price ★</span>
+            <span class="dict-desc"><strong>Target variable</strong> — vehicle price (range: 0 – 3,736,928,711)</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">06</span>
+            <span class="dict-name">year</span>
+            <span class="dict-desc">Year of manufacture (1900 – 2022)</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">07</span>
+            <span class="dict-name">manufacturer</span>
+            <span class="dict-desc">Vehicle manufacturer</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">08</span>
+            <span class="dict-name">model</span>
+            <span class="dict-desc">Vehicle model — free-text field</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">09</span>
+            <span class="dict-name">condition</span>
+            <span class="dict-desc">good · excellent · fair · like new · new · salvage</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">10</span>
+            <span class="dict-name">cylinders</span>
+            <span class="dict-desc">Engine cylinders: 3, 4, 5, 6, 8, 10, 12, other</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">11</span>
+            <span class="dict-name">fuel</span>
+            <span class="dict-desc">gas · other · diesel · hybrid · electric</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">12</span>
+            <span class="dict-name">odometer</span>
+            <span class="dict-desc">Vehicle mileage reading, in miles</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">13</span>
+            <span class="dict-name">title_status</span>
+            <span class="dict-desc">clean · rebuilt · lien · salvage · missing · parts only</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">14</span>
+            <span class="dict-name">transmission</span>
+            <span class="dict-desc">other · automatic · manual</span>
+          </div>
+          <div class="dict-row is-stable">
+            <span class="dict-num">15</span>
+            <span class="dict-name">vin ◆</span>
+            <span class="dict-desc"><strong>Stable identifier</strong> — Vehicle Identification Number</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">16</span>
+            <span class="dict-name">drive</span>
+            <span class="dict-desc">rwd · 4wd · fwd</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">17</span>
+            <span class="dict-name">size</span>
+            <span class="dict-desc">full-size · mid-size · compact · sub-compact</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">18</span>
+            <span class="dict-name">type</span>
+            <span class="dict-desc">sedan · SUV · pickup · truck · coupe · hatchback · wagon · van · mini-van · convertible · offroad · bus · other</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">19</span>
+            <span class="dict-name">paint_color</span>
+            <span class="dict-desc">white · blue · red · black · silver · grey · brown · yellow · orange · green · custom · purple</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">20</span>
+            <span class="dict-name">image_url</span>
+            <span class="dict-desc">Link to the vehicle image</span>
+          </div>
+          <div class="dict-row is-fretext">
+            <span class="dict-num">21</span>
+            <span class="dict-name">description</span>
+            <span class="dict-desc">Free-text description provided by the seller</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">22</span>
+            <span class="dict-name">county</span>
+            <span class="dict-desc">County — column completely empty in this dataset</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">23</span>
+            <span class="dict-name">state</span>
+            <span class="dict-desc">U.S. state where the ad was posted</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">24</span>
+            <span class="dict-name">lat</span>
+            <span class="dict-desc">Geographic latitude</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">25</span>
+            <span class="dict-name">long</span>
+            <span class="dict-desc">Geographic longitude</span>
+          </div>
+          <div class="dict-row">
+            <span class="dict-num">26</span>
+            <span class="dict-name">posting_date</span>
+            <span class="dict-desc">Date when the advertisement was posted</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Column Classification -->
+      <div class="subsection">
+        <div class="subsection-title">Column Classification</div>
+        <div class="classification-grid">
+          <div class="class-card cc-target">
+            <div class="class-card-label">★ Target Variable</div>
+            <div class="class-card-values">
+              <span class="class-pill">price</span>
+            </div>
+          </div>
+          <div class="class-card cc-stable">
+            <div class="class-card-label">◆ Stable Identifiers</div>
+            <div class="class-card-values">
+              <span class="class-pill">id</span>
+              <span class="class-pill">vin</span>
+            </div>
+          </div>
+          <div class="class-card cc-highcard">
+            <div class="class-card-label">⬡ High-Cardinality Categorical</div>
+            <div class="class-card-values">
+              <span class="class-pill">model</span>
+              <span class="class-pill">region</span>
+            </div>
+          </div>
+          <div class="class-card cc-freetext">
+            <div class="class-card-label">✎ Free-Text Fields</div>
+            <div class="class-card-values">
+              <span class="class-pill">description</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════ A2 ══════ -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-id id-a2">A2</span>
+      <span class="section-title">Missingness &amp; Validity</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title">Missing Value Handling Decisions</div>
+        <table class="decision-table">
+          <thead>
+            <tr>
+              <th>Decision</th>
+              <th>Column(s)</th>
+              <th>Missing %</th>
+              <th>Justification</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><span class="badge-drop">DROP COLUMN</span></td>
+              <td class="td-cols">county</td>
+              <td class="td-pct pct-drop">100%</td>
+              <td>Column is completely empty — provides no information for analysis</td>
+            </tr>
+            <tr>
+              <td><span class="badge-drop">DROP COLUMN</span></td>
+              <td class="td-cols">size</td>
+              <td class="td-pct pct-drop">71.77%</td>
+              <td>Over 70% missing — completing at this rate would be guessing and would add noise</td>
+            </tr>
+            <tr>
+              <td><span class="badge-drop-rows">DROP ROWS</span></td>
+              <td class="td-cols">price</td>
+              <td class="td-pct pct-drop">7.71%</td>
+              <td>A price of 0 is treated as a logical missing value. Price is the <strong>target variable</strong>, so these rows cannot be used</td>
+            </tr>
+            <tr>
+              <td><span class="badge-drop-rows">DROP ROWS</span></td>
+              <td class="td-cols">odometer, year</td>
+              <td class="td-pct pct-low">1.03% · 0.28%</td>
+              <td>The two main predictors of price. Imputing them would invent the values the analysis is about, and very few rows are affected</td>
+            </tr>
+            <tr>
+              <td><span class="badge-unknown">KEEP AS UNKNOWN</span></td>
+              <td class="td-cols">cylinders, condition, drive, paint_color, type</td>
+              <td class="td-pct pct-high">21.75% – 41.62%</td>
+              <td>Too high for imputation, but the features matter. Marked as <em>'unknown'</em> so the rest of the row is preserved</td>
+            </tr>
+            <tr>
+              <td><span class="badge-unknown">KEEP AS UNKNOWN</span></td>
+              <td class="td-cols">manufacturer, title_status, model, fuel, transmission</td>
+              <td class="td-pct pct-low">0.60% – 4.13%</td>
+              <td>A missing value becomes its own category. Filling with the most common value would invent data (every unknown model would become an F-150)</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keep">KEEP</span></td>
+              <td class="td-cols">vin</td>
+              <td class="td-pct pct-high">37.73%</td>
+              <td>An identifier, not a category — left empty where missing and used for de-duplication where present</td>
+            </tr>
+            <tr>
+              <td><span class="badge-keep">KEEP</span></td>
+              <td class="td-cols">lat, long, posting_date, state, region, id</td>
+              <td class="td-pct pct-zero">0% – 1.53%</td>
+              <td>Retained as-is; not used as model features</td>
+            </tr>
+            <tr>
+              <td><span class="badge-impute">NOT LOADED</span></td>
+              <td class="td-cols">description, url, region_url, image_url</td>
+              <td class="td-pct pct-zero">≤ 0.02%</td>
+              <td>Free text and links that the analysis does not use — they make up most of the 1.4 GB file</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Validity Rules -->
+      <div class="subsection">
+        <div class="subsection-title">Validity Rules Applied</div>
+        <div class="validity-grid">
+          <div class="validity-card">
+            <div class="validity-field">price</div>
+            <div class="validity-rule">$500 – $200,000</div>
+            <div class="validity-desc">Values outside this range considered outliers / data entry errors</div>
+          </div>
+          <div class="validity-card">
+            <div class="validity-field">odometer</div>
+            <div class="validity-rule">0 – 400,000 miles</div>
+            <div class="validity-desc">Negative mileage is impossible and readings above 400,000 miles are almost always typing errors</div>
+          </div>
+          <div class="validity-card">
+            <div class="validity-field">year</div>
+            <div class="validity-rule">1990 – 2022</div>
+            <div class="validity-desc">Older vehicles are classic cars, a different market with different price drivers</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════ A3 ══════ -->
+  <div class="section-card">
+    <div class="section-header">
+      <span class="section-id id-a3">A3</span>
+      <span class="section-title">De-duplication &amp; Leakage Checks</span>
+    </div>
+    <div class="section-body">
+
+      <div class="subsection">
+        <div class="subsection-title">Detection Method</div>
+        <div class="method-steps">
+          <div class="method-step">
+            <span class="step-num">1</span>
+            <span><strong style="color:var(--text-primary)">Exact Match</strong> — rows where all column values are identical</span>
+          </div>
+          <div class="method-step">
+            <span class="step-num">2</span>
+            <span><strong style="color:var(--text-primary)">Near-Duplicates</strong> — the same ID or the same VIN appearing more than once (the most recent ad is kept)</span>
+          </div>
+          <div class="method-step">
+            <span class="step-num">3</span>
+            <span><strong style="color:var(--text-primary)">Reposted ads</strong> — no VIN, but the same make, model, year, odometer and price</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="subsection">
+        <div class="subsection-title">Results</div>
+        <div class="stats-row" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))">
+          <div class="stat-card stat-ok">
+            <div class="stat-label">Exact Match Duplicates</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">No fully identical rows found</div>
+          </div>
+          <div class="stat-card stat-ok">
+            <div class="stat-label">ID-Based Duplicates</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">All advertisement IDs are unique</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-label">VIN-Based Duplicates</div>
+            <div class="stat-value">131,397</div>
+            <div class="stat-note">Same vehicle listed across multiple regions / dates</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-label">Reposted Ads Without a VIN</div>
+            <div class="stat-value">32,271</div>
+            <div class="stat-note">Same car details and price posted again</div>
+          </div>
+          <div class="stat-card stat-neutral">
+            <div class="stat-label">Clean Dataset</div>
+            <div class="stat-value">204,855</div>
+            <div class="stat-note">48.0% of the 426,880 raw rows</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Leakage -->
+      <div class="subsection">
+        <div class="subsection-title">Leakage Check Conclusion</div>
+        <div class="leakage-box">
+          <div class="leakage-icon">✅</div>
+          <div>
+            <div class="leakage-title">Dataset is Safe for Predictive Modeling</div>
+            <div class="leakage-body">
+              A thorough review of all <strong>26 columns</strong> was performed. <strong>All features are known at the time of the advertisement's creation</strong> — no post-hoc information (such as sale date or sold status) was found in the dataset. There is no target leakage. One caveat remains: the price column holds <strong>asking prices</strong>, not final sale prices.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

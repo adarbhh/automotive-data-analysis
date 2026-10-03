@@ -1,0 +1,9 @@
+feature_group,r2_without,r2_drop
+Vehicle age,0.4369,0.1386
+Odometer,0.534,0.0416
+Fuel type,0.5467,0.0289
+Body type,0.5548,0.0208
+Drive type,0.5578,0.0177
+Vehicle model,0.5693,0.0063
+Brand segment,0.5693,0.0062
+Transmission,0.574,0.0016

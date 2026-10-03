@@ -1,0 +1,6 @@
+drive,listings_before,median_price_before,listings_after,median_price_after
+2wd,0,,35,11550.0
+4wd,313,21999.0,419,22995.0
+fwd,320,10444.0,331,10488.0
+rwd,132,15994.5,132,15994.5
+unknown,235,16995.0,83,12500.0

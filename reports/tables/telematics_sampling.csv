@@ -1,0 +1,6 @@
+interval,rows,pct
+Duplicate timestamp (0 s),7054,0.67
+1 s (nominal rate),1031905,98.51
+2 s,7393,0.71
+3 - 10 s,470,0.04
+11 - 120 s,650,0.06

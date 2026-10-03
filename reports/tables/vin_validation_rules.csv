@@ -1,0 +1,6 @@
+rule,violations,violation_pct,example_vin
+Electric vehicle with an engine displacement,0,0.0,
+Combustion vehicle without an engine displacement,3,0.3,1HGCP28878A149515
+Model year out of range,0,0.0,
+Pickup without a drivetrain,3,0.3,1GC1KTEY0KF190901
+Listed year more than 1 year off the decoded year,3,0.3,19XFB2F55FE119763

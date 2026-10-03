@@ -1,0 +1,23 @@
+column,missing_pct,decision
+county,100.0,drop column
+size,71.77,drop column
+cylinders,41.62,keep as unknown
+condition,40.79,keep as unknown
+VIN,37.73,"keep (identifier, left empty)"
+drive,30.59,keep as unknown
+paint_color,30.5,keep as unknown
+type,21.75,keep as unknown
+price,7.71,drop rows
+manufacturer,4.13,keep as unknown
+title_status,1.93,keep as unknown
+lat,1.53,keep (not used)
+long,1.53,keep (not used)
+model,1.24,keep as unknown
+odometer,1.03,drop rows
+fuel,0.71,keep as unknown
+transmission,0.6,keep as unknown
+year,0.28,drop rows
+posting_date,0.02,keep (not used)
+state,0.0,keep (complete)
+region,0.0,keep (complete)
+id,0.0,keep (complete)

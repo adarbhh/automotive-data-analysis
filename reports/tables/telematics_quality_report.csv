@@ -1,0 +1,9 @@
+check,rows,pct_of_rows
+Missing accelerometer values,27,0.003
+Unparsed timestamps,0,0.0
+Duplicate timestamps inside a trip,7054,0.673
+Missing intervals (gap > 10 s inside a trip),650,0.062
+Accelerometer frozen for 10+ rows while moving,218568,20.845
+RPM = 0 while speed > 10 km/h (sensor dropout),1,0.0
+OBD speed vs GPS speed differ by > 20 km/h,28145,2.684
+GPS speed above 200 km/h (not plausible),151,0.014

@@ -1,0 +1,6 @@
+join_quality,recalls,pct_of_recalls
+Unmatched (manufacturer not in the listings),16090,54.15
+Low (Mfr only),5614,18.89
+Out of scope (tire / equipment / child seat),3843,12.93
+High (Mfr + Year + Model),3486,11.73
+Medium (Mfr + Year),679,2.29

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Automotive Data Analysis | Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="wrap">
+      <h1>Automotive Data Analysis</h1>
+      <p class="subtitle">Used-car pricing, safety recalls, VIN validation and telematics, from raw data to findings</p>
+      <nav class="tabs" role="tablist" aria-label="Dashboard sections">
+        <button class="tab is-active" role="tab" aria-selected="true" data-tab="overview">Overview</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="pricing">Pricing</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="recalls">Recalls</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="vin">VIN validation</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="telematics">Telematics</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ===================== OVERVIEW ===================== -->
+    <section class="panel is-active" id="tab-overview" role="tabpanel">
+      <div class="tiles" id="overview-tiles"></div>
+
+      <div class="card">
+        <h2>Key findings</h2>
+        <ol class="findings" id="overview-findings"></ol>
+      </div>
+
+      <div class="card">
+        <h2>How the project is built</h2>
+        <div class="stages" id="overview-stages"></div>
+        <p class="note">Every number on this dashboard is written by the Python scripts in <code>src/</code>. Nothing is typed in by hand.</p>
+      </div>
+
+      <div class="card">
+        <h2>Detailed report pages</h2>
+        <div class="page-links">
+          <a class="page-link" href="data_understanding_and_cleaning.html">
+            <span class="page-link-title">Data Understanding &amp; Cleaning</span>
+            <span class="page-link-text">Data dictionary, missing-value decisions, validity rules, de-duplication and leakage check</span>
+          </a>
+          <a class="page-link" href="eda_feature_engineering_and_business_framing.html">
+            <span class="page-link-title">EDA, Feature Engineering, and Business Framing</span>
+            <span class="page-link-text">Price distribution, segment and brand analysis, engineered features and the price model</span>
+          </a>
+          <a class="page-link" href="vehicle_recall_dashboard.html">
+            <span class="page-link-title">Vehicle Recall Dashboard: Top 10 Manufacturers</span>
+            <span class="page-link-text">Recall counts, components, trend since 2000 and a manufacturer-by-component heatmap</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PRICING ===================== -->
+    <section class="panel" id="tab-pricing" role="tabpanel" hidden>
+      <div class="tiles" id="pricing-tiles"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>From raw listings to a clean dataset</h2>
+          <p class="card-sub">Rows removed at each cleaning step, in the order the rules are applied</p>
+          <div class="chart-box h-320"><canvas id="chart-funnel"></canvas></div>
+          <p class="note" id="funnel-note"></p>
+        </div>
+        <div class="card">
+          <h2>Asking price distribution</h2>
+          <p class="card-sub">Number of listings per price band (bands widen with price, log scale)</p>
+          <div class="chart-box h-320"><canvas id="chart-hist"></canvas></div>
+          <p class="note">On a log scale the prices form a roughly symmetric bell shape, which is why the price model works on log(price).</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Depreciation curve</h2>
+            <p class="card-sub">Median asking price by vehicle age at the time of listing (2021)</p>
+          </div>
+          <label class="control">Brand
+            <select id="select-brand"></select>
+          </label>
+        </div>
+        <div class="chart-box h-340"><canvas id="chart-depreciation"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h2>Price by brand</h2>
+        <p class="card-sub">Bar = middle 50% of asking prices (25th to 75th percentile), dot = median. Brands with at least 500 listings.</p>
+        <div class="chart-box h-760"><canvas id="chart-brands"></canvas></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>What drives price most?</h2>
+          <p class="card-sub">Drop in the model's R&sup2; when each feature is removed</p>
+          <div class="chart-box h-320"><canvas id="chart-importance"></canvas></div>
+          <p class="note" id="model-note"></p>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <h2>Effect on asking price</h2>
+              <p class="card-sub">% difference against the baseline, with all other features held fixed</p>
+            </div>
+            <label class="control">Feature
+              <select id="select-effect"></select>
+            </label>
+          </div>
+          <div class="chart-box h-320"><canvas id="chart-effects"></canvas></div>
+          <p class="note" id="effects-note"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RECALLS ===================== -->
+    <section class="panel" id="tab-recalls" role="tabpanel" hidden>
+      <div class="tiles" id="recalls-tiles"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2>Recalls reported per year</h2>
+            <p class="card-sub" id="recalls-year-sub"></p>
+          </div>
+          <label class="control">Manufacturer
+            <select id="select-mfr"></select>
+          </label>
+        </div>
+        <div class="chart-box h-320"><canvas id="chart-recalls-year"></canvas></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Most recalls filed</h2>
+          <p class="card-sub">Number of recall campaigns, top 10 manufacturers</p>
+          <div class="chart-box h-340"><canvas id="chart-mfr-recalls"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Same manufacturers, by vehicles affected</h2>
+          <p class="card-sub">Units covered by those recalls (millions)</p>
+          <div class="chart-box h-340"><canvas id="chart-mfr-units"></canvas></div>
+        </div>
+      </div>
+      <p class="note outside">Exposure bias: a manufacturer that sells more vehicles files more recalls. RV and truck makers file many small recalls, while a single passenger-car recall can cover millions of vehicles, so the two rankings differ.</p>
+
+      <div class="card">
+        <h2>Which components are recalled?</h2>
+        <p class="card-sub">Recalls per year for the five most recalled components</p>
+        <div class="chart-box h-340"><canvas id="chart-components"></canvas></div>
+        <p class="note" id="components-note"></p>
+      </div>
+
+      <div class="card">
+        <h2>Failure modes found in the recall text</h2>
+        <p class="card-sub" id="topics-sub"></p>
+        <div class="table-scroll"><table id="table-topics"></table></div>
+        <div class="tiles tiles-inline" id="severity-tiles"></div>
+        <p class="note">The severity score is a keyword proxy (3 = fire or loss of control, 2 = crash or injury risk, 1 = neither). It was checked against NHTSA's own "park outside" and "do not drive" advisories, which the proxy never reads.</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Joining recalls to the listings</h2>
+          <p class="card-sub">Share of the cleaned listings reached at each join level</p>
+          <div class="chart-box h-260"><canvas id="chart-join-listings"></canvas></div>
+          <div class="table-scroll"><table id="table-join-recalls"></table></div>
+        </div>
+        <div class="card">
+          <h2>Recalls on the most listed models</h2>
+          <p class="card-sub">Average number of recalls on record per listing (same model and model year)</p>
+          <div class="chart-box h-420"><canvas id="chart-top-models"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== VIN ===================== -->
+    <section class="panel" id="tab-vin" role="tabpanel" hidden>
+      <div class="tiles" id="vin-tiles"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>What the decoder returns</h2>
+          <p class="card-sub">Share of the sampled VINs with each specification</p>
+          <div class="chart-box h-260"><canvas id="chart-vin-coverage"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Listing vs. decoder</h2>
+          <p class="card-sub">Gaps the decoder filled and values where the seller and the VIN disagree</p>
+          <div class="table-scroll"><table id="table-vin-audit"></table></div>
+          <p class="note">Sellers are rarely wrong (conflicts stay around 2% or less). The value of the decoder is in filling fields the seller left empty.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Does enrichment change the picture?</h2>
+        <p class="card-sub">Listings per drive type in the sample, before and after filling unknowns from the VIN</p>
+        <div class="chart-box h-320"><canvas id="chart-vin-drive"></canvas></div>
+        <p class="note" id="vin-drive-note"></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Validation rules</h2>
+          <div class="table-scroll"><table id="table-vin-rules"></table></div>
+        </div>
+        <div class="card">
+          <h2>Error taxonomy and decisions</h2>
+          <div class="table-scroll"><table id="table-vin-taxonomy"></table></div>
+          <div class="table-scroll"><table id="table-vin-decisions"></table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TELEMATICS ===================== -->
+    <section class="panel" id="tab-telematics" role="tabpanel" hidden>
+      <div class="tiles" id="telematics-tiles"></div>
+
+      <div class="card">
+        <h2>One trip, second by second</h2>
+        <p class="card-sub" id="trip-sub"></p>
+        <div class="chart-box h-220"><canvas id="chart-trip-speed"></canvas></div>
+        <div class="chart-box h-220"><canvas id="chart-trip-rpm"></canvas></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h2>Data quality report</h2>
+          <div class="table-scroll"><table id="table-quality"></table></div>
+          <p class="note" id="quality-note"></p>
+        </div>
+        <div class="card">
+          <h2>Harsh events by device</h2>
+          <p class="card-sub">Harsh braking and acceleration events (above 3 m/s&sup2;) per 100 km</p>
+          <div class="chart-box h-300"><canvas id="chart-harsh"></canvas></div>
+          <p class="note">Each device is one vehicle. Events are normalized by distance so that vehicles driven more are not penalized. Vehicles with less than 100 km of data are left out.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="wrap page-footer">
+    <p>Data: Craigslist Cars &amp; Trucks (Kaggle), NHTSA Recalls, NHTSA vPIC VIN decoder, public OBD-II telematics dataset. Asking prices are not sale prices.</p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="data/cleaning.js"></script>
+  <script src="data/pricing.js"></script>
+  <script src="data/recalls.js"></script>
+  <script src="data/vin.js"></script>
+  <script src="data/telematics.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Recall Dashboard - Top 10 Manufacturers Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: #e8ecf0;
+    color: #1a1a2e;
+    padding: 16px 20px 32px;
+    min-height: 100vh;
+  }
+
+  /* ── Title ── */
+  .page-title {
+    text-align: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 16px;
+    letter-spacing: 0;
+    text-decoration: underline;
+    text-decoration-color: #aab;
+    text-underline-offset: 3px;
+  }
+
+  /* ── 3-card KPI row ── */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Card 1: blue border */
+  .kpi-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 22px 24px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+    position: relative;
+    transition: box-shadow .2s;
+  }
+  .kpi-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.13); }
+
+  .kpi-card.blue-border  { border: 2px solid #5bc8e8; }
+  .kpi-card.red-border   { border: 2px solid #e8a09a; background: #fdf0ef; }
+  .kpi-card.green-border { border: 2px solid #5ec8b0; background: #f0faf7; }
+
+  .kpi-big {
+    font-size: 46px;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .kpi-sub-label {
+    font-size: 13px;
+    color: #8090a8;
+    font-weight: 400;
+  }
+
+  /* Card 2 */
+  .kpi-card .top-label {
+    font-size: 11.5px;
+    color: #8090a8;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .kpi-name-big {
+    font-size: 24px;
+    font-weight: 700;
+    color: #e05050;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .kpi-count {
+    font-size: 16px;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+  }
+
+  /* Card 3 */
+  .kpi-peak-year {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2da88a;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .kpi-peak-recalls {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .kpi-comp-label {
+    font-size: 11px;
+    color: #8090a8;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .kpi-comp-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #e8a020;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Main grid ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* ── Bottom grid ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 14px;
+  }
+
+  /* ── Chart panels ── */
+  .panel {
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+  }
+  .panel-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #1a1a2e;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  /* ── Heatmap: rotated col headers ── */
+  .heatmap-outer { overflow-x: auto; }
+  .htable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11.5px;
+  }
+  /* Rotated headers */
+  .htable thead tr {
+    height: 90px;
+    vertical-align: bottom;
+  }
+  .htable th {
+    background: transparent;
+    border: none;
+    padding: 0 4px 4px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    color: #555;
+    white-space: nowrap;
+  }
+  .htable th.col-header {
+    vertical-align: bottom;
+    padding-bottom: 6px;
+  }
+  .htable th.col-header div {
+    transform: rotate(-45deg);
+    transform-origin: left bottom;
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 600;
+    color: #444;
+    line-height: 1;
+    margin-left: 10px;
+  }
+  .htable th.rh { min-width: 90px; }
+
+  .htable td {
+    border: 1px solid #e8eaf0;
+    padding: 8px 5px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    transition: filter .15s;
+  }
+  .htable td.mn {
+    text-align: left;
+    padding-left: 6px;
+    font-weight: 600;
+    font-size: 10.5px;
+    color: #1a1a2e;
+    background: #fafbfd;
+    white-space: nowrap;
+    border: 1px solid #e8eaf0;
+  }
+  .htable tr:hover td { filter: brightness(0.94); }
+
+  /* Y-axis label for heatmap */
+  .heatmap-wrap {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .y-axis-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    text-align: center;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+  .x-axis-label {
+    text-align: center;
+    font-size: 10px;
+    color: #888;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* Colour bar legend for heatmap */
+  .heatmap-legend {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+  .legend-bar {
+    width: 14px;
+    flex: 1;
+    max-height: 200px;
+    background: linear-gradient(to bottom, #c0392b, #e67e22, #f5c542, #fde8cb, #fff9f0);
+    border-radius: 3px;
+  }
+  .legend-label {
+    font-size: 9px;
+    color: #888;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    text-align: center;
+  }
+
+  /* Heat cell colors */
+  .c0 { background: #fff9f0; color: #7a6200; }
+  .c1 { background: #fde8cb; color: #7a4010; }
+  .c2 { background: #f5c542; color: #5a3000; }
+  .c3 { background: #e67e22; color: #fff; }
+  .c4 { background: #c0392b; color: #fff; }
+
+  /* canvas max heights */
+  #barCanvas   { max-height: 270px; }
+  #donutCanvas { max-height: 270px; }
+  #trendCanvas { max-height: 210px; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .kpi-card { animation: fadeUp .45s ease both; }
+  .kpi-row .kpi-card:nth-child(1){ animation-delay:.04s }
+  .kpi-row .kpi-card:nth-child(2){ animation-delay:.09s }
+  .kpi-row .kpi-card:nth-child(3){ animation-delay:.14s }
+  .panel { animation: fadeUp .5s ease both; animation-delay:.18s; }
+
+  /* panels may shrink inside the grid; heatmap columns share the available width */
+  .panel { min-width: 0; }
+  .htable { table-layout: fixed; }
+  .htable th.rh { width: 112px; }
+
+  /* narrow screens: one column */
+  @media (max-width: 900px) {
+    .kpi-row, .main-grid, .bottom-grid { grid-template-columns: 1fr; }
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 10px;
+    color: #aab0c0;
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" style="display:inline-block;margin-bottom:6px;font-size:13px;color:#2563eb;text-decoration:none;font-weight:600">&larr; Main dashboard</a>
+<div class="page-title">Vehicle Recall Dashboard - Top 10 Manufacturers Analysis</div>
+
+<!-- 3 KPI cards -->
+<div class="kpi-row">
+
+  <!-- Card 1 -->
+  <div class="kpi-card blue-border">
+    <div class="kpi-big" id="kpiTotal"></div>
+    <div class="kpi-sub-label">Total Recalls (Top 10 Manufacturers)</div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="kpi-card red-border">
+    <div class="top-label">Top Manufacturer</div>
+    <div class="kpi-name-big" id="kpiTopName"></div>
+    <div class="kpi-count" id="kpiTopCount"></div>
+  </div>
+
+  <!-- Card 3 -->
+  <div class="kpi-card green-border">
+    <div class="kpi-peak-year" id="kpiPeakYear"></div>
+    <div class="kpi-peak-recalls" id="kpiPeakRecalls"></div>
+    <div class="kpi-comp-label">Top Component:</div>
+    <div class="kpi-comp-value" id="kpiTopComponent"></div>
+  </div>
+
+</div>
+
+<!-- Top row: bar + donut -->
+<div class="main-grid">
+  <div class="panel">
+    <div class="panel-title">Top 10 Manufacturers by Recall Count</div>
+    <canvas id="barCanvas"></canvas>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Top 10 Components Distribution</div>
+    <canvas id="donutCanvas"></canvas>
+  </div>
+</div>
+
+<!-- Bottom row: trend + heatmap -->
+<div class="bottom-grid">
+  <div class="panel">
+    <div class="panel-title" id="trendTitle"></div>
+    <canvas id="trendCanvas"></canvas>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Top 5 Manufacturers vs Components</div>
+    <div class="heatmap-wrap">
+      <div class="y-axis-label">Manufacturer</div>
+      <div style="flex:1; overflow-x:auto;">
+        <table class="htable" id="heatTable">
+          <thead>
+            <tr id="heatHead"></tr>
+          </thead>
+          <tbody id="heatBody"></tbody>
+        </table>
+        <div class="x-axis-label">Component</div>
+      </div>
+      <!-- colour-scale legend -->
+      <div class="heatmap-legend">
+        <div style="font-size:9px;color:#888;margin-bottom:2px" id="heatMax"></div>
+        <div class="legend-bar"></div>
+        <div style="font-size:9px;color:#888;margin-top:2px">0</div>
+        <div class="legend-label" style="margin-top:4px">Recall Count</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="footer"></div>
+
+<script src="data/recalls_top10.js"></script>
+<script>
+/* ── DATA — written by src/03_recalls_analysis.py into data/recalls_top10.js ── */
+const R = window.DASHBOARD.recalls_top10;
+
+const FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif';
+Chart.defaults.font.family = FONT;
+
+// Short names for the chart labels
+const shortName = n => n.replace(/,? (Inc\.|LLC).*$/, '').replace(' North America', '');
+
+const MFR_LABELS = R.manufacturers.map(m => shortName(m.name));
+const MFR_COUNTS = R.manufacturers.map(m => m.recalls);
+
+const COMP_LABELS = R.components.map(c => c.component);
+const COMP_COUNTS = R.components.map(c => c.recalls);
+
+const TREND_YEARS  = R.trend_years;
+const TREND_VALUES = R.trend_values;
+const PEAK_IDX = TREND_VALUES.indexOf(Math.max(...TREND_VALUES));
+
+/* Heatmap: top 5 manufacturers (rows) x top 5 components (columns) */
+const HEAT_ROWS = R.heat_manufacturers.map((name, i) => ({ name: shortName(name), vals: R.heat_values[i] }));
+const HEAT_MAX = Math.max(...R.heat_values.flat());
+
+/* ── KPI cards and titles ── */
+const setText = (id, text) => { document.getElementById(id).textContent = text; };
+setText('kpiTotal', R.total_recalls.toLocaleString());
+setText('kpiTopName', R.manufacturers[0].name);
+setText('kpiTopCount', R.manufacturers[0].recalls.toLocaleString() + ' Recalls');
+setText('kpiPeakYear', 'Peak Year: ' + R.peak_year);
+setText('kpiPeakRecalls', R.peak_recalls.toLocaleString() + ' Recalls');
+setText('kpiTopComponent', `${COMP_LABELS[0]} (${COMP_COUNTS[0].toLocaleString()})`);
+setText('trendTitle', `Recall Trends Over Time (${TREND_YEARS[0]}-${TREND_YEARS[TREND_YEARS.length - 1]})`);
+setText('heatMax', HEAT_MAX);
+setText('footer', `Data spans ${R.first_year}–${R.last_year} (2026 excluded: partial year) · Top 10 manufacturers, brands grouped by parent company · ` +
+  `${R.missing_component.toLocaleString()} recalls without a component are excluded from the component charts`);
+
+/* ── BAR COLORS matching screenshot (multi-color per bar) ── */
+const BAR_COLORS = [
+  '#e74c3c','#f39c12','#9b59b6','#1abc9c','#3498db',
+  '#e67e22','#2ecc71','#e91e8c','#00bcd4','#8bc34a'
+];
+const DONUT_COLORS = [
+  '#e74c3c','#5bc8e8','#1abc9c','#f5c542','#f39c12',
+  '#c0c0e0','#9b59b6','#b0d080','#e8c880','#4cae8c'
+];
+
+/* ── VALUE LABELS PLUGIN ── */
+const valueLabels = {
+  id:'valueLabels',
+  afterDatasetsDraw(chart){
+    const ctx=chart.ctx;
+    chart.data.datasets[0].data.forEach((val,i)=>{
+      if(!val)return;
+      const m=chart.getDatasetMeta(0).data[i];
+      ctx.save();
+      ctx.fillStyle='#1a1a2e';
+      ctx.font='600 11px ' + FONT;
+      ctx.textAlign='left';
+      ctx.fillText(val.toLocaleString(), m.x+5, m.y+4);
+      ctx.restore();
+    });
+  }
+};
+
+/* ── BAR CHART ── */
+new Chart(document.getElementById('barCanvas').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels: MFR_LABELS,
+    datasets:[{data:MFR_COUNTS, backgroundColor:BAR_COLORS,
+               borderRadius:3, borderSkipped:false, barThickness:20}]
+  },
+  options:{
+    indexAxis:'y', responsive:true,
+    aspectRatio: window.innerWidth < 900 ? 1.2 : 2,
+    layout:{padding:{right:50}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>`  ${c.parsed.x.toLocaleString()} recalls`}}
+    },
+    scales:{
+      x:{
+        grid:{color:'#eef0f6'},
+        ticks:{font:{size:10}, color:'#8090a8'},
+        title:{display:true, text:'Number of Recalls',
+               font:{size:11}, color:'#8090a8'}
+      },
+      y:{
+        grid:{display:false},
+        ticks:{font:{size:10.5}, color:'#1a1a2e'}
+      }
+    },
+    animation:{duration:700, easing:'easeOutQuart'}
+  },
+  plugins:[valueLabels]
+});
+
+/* ── DONUT CHART ── */
+new Chart(document.getElementById('donutCanvas').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels: COMP_LABELS,
+    datasets:[{data:COMP_COUNTS, backgroundColor:DONUT_COLORS,
+               borderWidth:2, borderColor:'#fff', hoverOffset:5}]
+  },
+  options:{
+    cutout:'58%', responsive:true,
+    plugins:{
+      legend:{
+        position:'right',
+        labels:{
+          font:{size:10}, color:'#1a1a2e',
+          boxWidth:11, padding:8, usePointStyle:true, pointStyleWidth:9,
+          generateLabels(chart){
+            const ds=chart.data.datasets[0];
+            return chart.data.labels.map((lbl,i)=>({
+              text: lbl.length>20 ? lbl.slice(0,18)+'…' : lbl,
+              fillStyle: ds.backgroundColor[i],
+              strokeStyle: '#fff',
+              lineWidth: 1,
+              pointStyle: 'rect',
+              hidden: false,
+              index: i
+            }));
+          }
+        }
+      },
+      tooltip:{
+        callbacks:{
+          label(ctx){
+            const t=COMP_COUNTS.reduce((a,b)=>a+b,0);
+            return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} (${(ctx.parsed/t*100).toFixed(1)}%)`;
+          }
+        }
+      }
+    },
+    animation:{duration:800}
+  }
+});
+
+/* ── TREND LINE ── */
+const tCtx=document.getElementById('trendCanvas').getContext('2d');
+const grad=tCtx.createLinearGradient(0,0,0,210);
+grad.addColorStop(0,'rgba(91,200,232,0.45)');
+grad.addColorStop(1,'rgba(91,200,232,0.02)');
+
+new Chart(tCtx,{
+  type:'line',
+  data:{
+    labels:TREND_YEARS,
+    datasets:[{
+      data:TREND_VALUES,
+      borderColor:'#4a90d9',
+      borderWidth:2,
+      pointRadius: TREND_VALUES.map((_,i)=>i===PEAK_IDX?8:2.5),
+      pointBackgroundColor: TREND_VALUES.map((_,i)=>i===PEAK_IDX?'#e74c3c':'#4a90d9'),
+      pointBorderColor:'#fff',
+      pointBorderWidth: TREND_VALUES.map((_,i)=>i===PEAK_IDX?2:1),
+      fill:true,
+      backgroundColor:grad,
+      tension:0.35
+    }]
+  },
+  options:{
+    responsive:true,
+    layout:{padding:{top:28,right:34}},
+    plugins:{
+      legend:{display:false},
+      tooltip:{callbacks:{label:c=>` ${c.parsed.y} recalls`}}
+    },
+    scales:{
+      x:{
+        grid:{color:'#eef0f6'},
+        ticks:{font:{size:9.5}, color:'#8090a8', maxTicksLimit:14},
+        title:{display:true, text:'Year', font:{size:11}, color:'#8090a8'}
+      },
+      y:{
+        grid:{color:'#eef0f6'},
+        ticks:{font:{size:9.5}, color:'#8090a8'},
+        title:{display:true, text:'Number of Recalls', font:{size:11}, color:'#8090a8'}
+      }
+    },
+    animation:{duration:800}
+  },
+  plugins:[{
+    id:'peakBadge',
+    afterDatasetsDraw(chart){
+      const ctx=chart.ctx;
+      const meta=chart.getDatasetMeta(0).data[PEAK_IDX];
+      if(!meta)return;
+      const x=meta.x, y=meta.y-18;
+      ctx.save();
+      ctx.font='bold 10px ' + FONT;
+      const lbl='Peak: ' + TREND_VALUES[PEAK_IDX];
+      const w=ctx.measureText(lbl).width+14;
+      ctx.fillStyle='#fff9e6';
+      ctx.strokeStyle='#f5a623';
+      ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.roundRect(x-w/2, y-12, w, 17, 3);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#b8600a';
+      ctx.textAlign='center';
+      ctx.fillText(lbl, x, y+2);
+      ctx.restore();
+    }
+  }]
+});
+
+/* ── HEATMAP ── */
+function heatCls(v){
+  // five colour steps relative to the largest cell
+  const share = v / HEAT_MAX;
+  if(share>=0.65)return'c4';
+  if(share>=0.45)return'c3';
+  if(share>=0.25)return'c2';
+  if(share>=0.12)return'c1';
+  return'c0';
+}
+document.getElementById('heatHead').innerHTML = '<th class="rh"></th>' +
+  R.heat_components.map(c => `<th class="col-header"><div>${c.length > 16 ? c.slice(0, 15) + '…' : c}</div></th>`).join('');
+const tbody=document.getElementById('heatBody');
+HEAT_ROWS.forEach(row=>{
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td class="mn">${row.name}</td>`+
+    row.vals.map(v=>`<td class="${heatCls(v)}">${v}</td>`).join('');
+  tbody.appendChild(tr);
+});
+</script>
+</body>
+</html>

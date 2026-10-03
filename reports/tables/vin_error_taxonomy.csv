@@ -1,0 +1,9 @@
+error_type,category,count,pct_of_sample
+Listing error,Manufacturer conflict,3,0.3
+Listing error,Model year conflict,3,0.3
+Listing error,Drive type conflict,12,1.2
+Listing error,Fuel type conflict,4,0.4
+Decoder missingness,VIN not decoded,1,0.1
+Decoder missingness,Missing engine,10,1.0
+Decoder missingness,Missing drivetrain,267,26.7
+Decoder missingness,Missing body class,2,0.2

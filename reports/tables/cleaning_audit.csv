@@ -1,0 +1,8 @@
+step,rows_removed,rows_remaining,pct_of_original
+Price missing or zero,32895,393985,7.71
+"Price outside $500 - $200,000",9323,384662,2.18
+Year missing or outside 1990 - 2022,13007,371655,3.05
+"Odometer missing or outside 0 - 400,000 miles",3132,368523,0.73
+Exact duplicate rows / duplicate ad IDs,0,368523,0.0
+Same vehicle listed again (duplicate VIN),131397,237126,30.78
+Same ad reposted without a VIN (same car details and price),32271,204855,7.56

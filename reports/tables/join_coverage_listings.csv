@@ -1,0 +1,5 @@
+level,listings,pct_of_listings
+Manufacturer mapped to a recall group,198125,96.7
+Model name usable as a join key,180870,88.3
+Manufacturer + year has at least one recall,193881,94.6
+Model + year has at least one recall (recalled_flag = 1),155541,75.9

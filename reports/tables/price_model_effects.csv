@@ -1,0 +1,48 @@
+group,label,pct_effect,coefficient
+Vehicle age,+1 year,-6.8399,-0.0709
+Odometer,"+10,000 miles",-3.6412,-0.0371
+Body type,SUV (vs sedan),20.8813,0.1896
+Body type,bus (vs sedan),17.3724,0.1602
+Body type,convertible (vs sedan),58.8603,0.4629
+Body type,coupe (vs sedan),32.2139,0.2793
+Body type,hatchback (vs sedan),-3.2716,-0.0333
+Body type,mini-van (vs sedan),13.1393,0.1234
+Body type,offroad (vs sedan),69.8871,0.53
+Body type,other (vs sedan),41.114,0.3444
+Body type,pickup (vs sedan),65.4588,0.5036
+Body type,truck (vs sedan),57.7215,0.4557
+Body type,unknown (vs sedan),14.4677,0.1351
+Body type,van (vs sedan),40.0414,0.3368
+Body type,wagon (vs sedan),6.4759,0.0627
+Fuel type,diesel (vs gas),108.2799,0.7337
+Fuel type,electric (vs gas),1.8273,0.0181
+Fuel type,hybrid (vs gas),9.138,0.0874
+Fuel type,other (vs gas),13.0043,0.1223
+Fuel type,unknown (vs gas),21.1435,0.1918
+Transmission,manual (vs automatic),8.8788,0.0851
+Transmission,other (vs automatic),12.4746,0.1176
+Transmission,unknown (vs automatic),13.1858,0.1239
+Drive type,4wd (vs fwd),40.0256,0.3367
+Drive type,rwd (vs fwd),40.153,0.3376
+Drive type,unknown (vs fwd),10.0845,0.0961
+Brand segment,Luxury (vs Standard),23.1455,0.2082
+Vehicle model,1500 (vs Other),5.4284,0.0529
+Vehicle model,2500 (vs Other),17.5032,0.1613
+Vehicle model,accord (vs Other),4.9299,0.0481
+Vehicle model,altima (vs Other),-17.0863,-0.1874
+Vehicle model,camry (vs Other),8.2664,0.0794
+Vehicle model,civic (vs Other),-5.4784,-0.0563
+Vehicle model,corolla (vs Other),-6.7699,-0.0701
+Vehicle model,cr-v (vs Other),7.1102,0.0687
+Vehicle model,equinox (vs Other),-14.0366,-0.1512
+Vehicle model,escape (vs Other),-21.1045,-0.237
+Vehicle model,explorer (vs Other),2.8555,0.0282
+Vehicle model,f-150 (vs Other),14.0649,0.1316
+Vehicle model,focus (vs Other),-28.4733,-0.3351
+Vehicle model,fusion (vs Other),-10.2348,-0.108
+Vehicle model,grand cherokee (vs Other),-3.1502,-0.032
+Vehicle model,mustang (vs Other),1.9631,0.0194
+Vehicle model,silverado (vs Other),22.2769,0.2011
+Vehicle model,silverado 1500 (vs Other),23.1834,0.2085
+Vehicle model,tacoma (vs Other),29.2001,0.2562
+Vehicle model,wrangler (vs Other),68.2323,0.5202

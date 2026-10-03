@@ -1,0 +1,5 @@
+signal,min,50%,99%,max,missing
+OBD speed (km/h),0.0,17.0,99.0,149.0,0
+GPS speed (km/h),0.0,18.15,103.71,512.23,0
+Engine RPM,0.0,996.0,2420.0,5764.0,0
+"Accelerometer X (normalized, -1 to 1)",-0.96,0.0,0.99,1.0,27

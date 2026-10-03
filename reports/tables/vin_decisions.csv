@@ -1,0 +1,5 @@
+action,listings,pct_of_sample
+Keep,993,99.3
+Correct,3,0.3
+Flag,3,0.3
+Drop,1,0.1
